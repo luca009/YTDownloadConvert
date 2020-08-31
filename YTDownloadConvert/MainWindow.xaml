@@ -5,26 +5,64 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YTDownloadConvert"
         mc:Ignorable="d"
-        Title="YTDownloadConvert" Height="268" Width="452">
-    <Grid>
-        <TextBox x:Name="tbLink" Margin="10,10,78,0" TextWrapping="Wrap" VerticalAlignment="Top" UndoLimit="10"/>
-        <Button x:Name="bGo" Content="Download" HorizontalAlignment="Right" Margin="0,10,15,0" VerticalAlignment="Top" Click="bGo_Click" IsDefault="True" Height="18"/>
-        <Label x:Name="lDownloading" Content="Downloading" HorizontalAlignment="Left" Margin="71,74,0,0" VerticalAlignment="Top" Visibility="Hidden"/>
-        <CheckBox x:Name="cboxCut" Content="Cut" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="tbFrom" HorizontalAlignment="Right" Margin="0,32,98,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="78" TextChanged="tbNumber_TextChanged"/>
-        <TextBox x:Name="tbTo" HorizontalAlignment="Right" Margin="0,32,15,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="78" TextChanged="tbNumber_TextChanged"/>
-        <CheckBox x:Name="cboxConvert" Content="Convert" HorizontalAlignment="Left" Margin="10,53,0,0" VerticalAlignment="Top"/>
-        <ComboBox x:Name="cbConvertType" HorizontalAlignment="Right" Margin="0,52,15,0" VerticalAlignment="Top" Width="120" Height="18">
-            <ComboBoxItem Content=".mp4"/>
-            <ComboBoxItem Content=".webm"/>
-            <ComboBoxItem Content=".avi"/>
-            <ComboBoxItem Content=".mkv"/>
-            <Separator />
-            <ComboBoxItem Content=".mp3"/>
-            <ComboBoxItem Content=".wav"/>
-            <ComboBoxItem Content=".ogg"/>
-            <ComboBoxItem Content=".flac"/>
-        </ComboBox>
+        Title="YTDownloadConvert" Height="300" Width="450" MinWidth="400" MinHeight="150">
+    <Grid x:Name="gridMain">
+        <TextBox x:Name="tbLink" Margin="5,5,70,0" TextWrapping="NoWrap" VerticalAlignment="Top" UndoLimit="10"/>
+        <Button x:Name="bGo" Content="Download" HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top" Click="bGo_Click" IsDefault="True" Height="18" BorderThickness="1,1,1,1" Width="60"/>
+        <StatusBar x:Name="statusBar" Margin="0,0,0,0" VerticalAlignment="Bottom" Height="20" HorizontalContentAlignment="Left">
+            <TextBlock x:Name="textStatus" HorizontalAlignment="Left" Text="Idle" FontSize="12" MinWidth="70"/>
+            <Separator HorizontalAlignment="Left"/>
+            <TextBlock x:Name="textETA" HorizontalAlignment="Left" Text="ETA: ?" FontSize="12" MinWidth="75"/>
+            <TextBlock x:Name="textSpeed" HorizontalAlignment="Left" Text="Speed: ?" FontSize="12" MinWidth="120"/>
+            <ProgressBar x:Name="pbProgress" Height="14" VerticalAlignment="Top" HorizontalAlignment="Left" HorizontalContentAlignment="Left" Maximum="1000" Width="100"/>
+        </StatusBar>
+        <ScrollViewer Margin="0,28,0,20" VerticalScrollBarVisibility="Auto" HorizontalContentAlignment="Stretch" HorizontalScrollBarVisibility="Hidden">
+            <ListBox Padding="-4,-1,0,0" UseLayoutRounding="False" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                <Expander VerticalAlignment="Top" Header="Download Options" Grid.Row="1">
+                    <Grid Height="91">
+                        <RadioButton x:Name="rbWorst" Content="Worst" Margin="0,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                        <RadioButton x:Name="rbBest" Content="Best" Margin="55,4,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsChecked="True"/>
+                        <ComboBox x:Name="cboxResolution" HorizontalAlignment="Right" VerticalAlignment="Top" Width="120" Height="20" Margin="0,1,0,0">
+                            <ComboBoxItem Content="Auto" IsSelected="True"/>
+                            <ComboBoxItem Content="360p"/>
+                            <ComboBoxItem Content="480p"/>
+                            <ComboBoxItem Content="720p"/>
+                            <ComboBoxItem Content="1080p"/>
+                            <ComboBoxItem Content="1440p"/>
+                            <ComboBoxItem Content="2160p"/>
+                        </ComboBox>
+                        <TextBlock Text="Resolution" TextWrapping="Wrap" Margin="0,3,125,0" HorizontalAlignment="Right" VerticalAlignment="Top"/>
+                        <TextBlock Text="Download Path:" TextWrapping="NoWrap" Margin="0,28,0,0" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                        <Button x:Name="bSet" HorizontalAlignment="Right" VerticalAlignment="Top" Width="60" Height="20" Margin="0,26,0,0" Content="Set" Click="bSet_Click" />
+                        <TextBox x:Name="tbDownloadPath" Text="TextBox" TextWrapping="NoWrap" VerticalAlignment="Top" Margin="85,27,65,0" IsReadOnly="True" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+                    </Grid>
+                </Expander>
+                <Expander VerticalAlignment="Top" Header="Processing Options" Grid.Row="2" Margin="0,0,0,0" HorizontalContentAlignment="Stretch">
+                    <Grid>
+                        <CheckBox x:Name="cboxCut" Content="Cut" HorizontalAlignment="Left" Margin="0,1,0,0" VerticalAlignment="Top"/>
+                        <TextBox x:Name="tbFrom" HorizontalAlignment="Right" Margin="0,0,92,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="70" TextChanged="tbNumber_TextChanged"/>
+                        <TextBox x:Name="tbTo" HorizontalAlignment="Right" TextWrapping="NoWrap" VerticalAlignment="Top" Width="70" TextChanged="tbNumber_TextChanged"/>
+                        <CheckBox x:Name="cboxConvert" Content="Convert" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,25,0,0"/>
+                        <ComboBox x:Name="cbConvertType" HorizontalAlignment="Right" Margin="0,0,0,0" VerticalAlignment="Center" Width="120" Height="20" FontSize="10">
+                            <ComboBoxItem Content=".mp4"/>
+                            <ComboBoxItem Content=".webm"/>
+                            <ComboBoxItem Content=".avi"/>
+                            <ComboBoxItem Content=".mkv"/>
+                            <Separator />
+                            <ComboBoxItem Content=".mp3"/>
+                            <ComboBoxItem Content=".wav"/>
+                            <ComboBoxItem Content=".ogg"/>
+                            <ComboBoxItem Content=".flac"/>
+                        </ComboBox>
+                        <TextBlock HorizontalAlignment="Right" Margin="0,1,167,0" Text="From" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <TextBlock HorizontalAlignment="Right" Margin="0,1,75,0" Text="To" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                        <CheckBox x:Name="cboxBitrate" Content="Change Bitrate" HorizontalAlignment="Left" Margin="0,50,0,0" VerticalAlignment="Top"/>
+                        <TextBox x:Name="tbBitrate" HorizontalAlignment="Right" Margin="0,47,28,0" TextWrapping="NoWrap" VerticalAlignment="Top" Width="70" TextChanged="tbNumber_TextChanged"/>
+                        <TextBlock HorizontalAlignment="Right" Margin="0,48,0,0" Text="kb/s" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    </Grid>
+                </Expander>
+            </ListBox>
+        </ScrollViewer>
 
     </Grid>
 </Window>
