@@ -34,6 +34,7 @@ namespace YTDownloadConvert
     {
         string runningPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
         string filePath;
+        YoutubeDL downloader = new YoutubeDL();
 
         public MainWindow()
         {
@@ -49,8 +50,9 @@ namespace YTDownloadConvert
         private async void bGo_Click(object sender, RoutedEventArgs e)
         {
             textStatus.Text = "Preparing";
-            gridMain.Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
-            var downloader = new YoutubeDL();
+            bGo.IsEnabled = false;
+            Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
+            downloader = new YoutubeDL();
             string fileName = "";
             downloader.VideoUrl = tbLink.Text;
             downloader.Options.FilesystemOptions.NoMtime = true;
@@ -74,31 +76,32 @@ namespace YTDownloadConvert
                 downloader.Options.VideoFormatOptions.FormatAdvanced += $"[height <=? {Int32.Parse(cboxResolution.Text.TrimEnd('p'))}]";
 
             textStatus.Text = "Downloading";
+            pbProgress.Visibility = Visibility.Visible;
             downloader.DownloadAsync();
             while (downloader.IsDownloading)
             {
                 pbProgress.Value = downloader.Info.VideoProgress;
                 textETA.Text = "ETA: " + downloader.Info.Eta;
                 textSpeed.Text = "Speed: " + downloader.Info.DownloadRate;
-                gridMain.Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
+                Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
             }
             pbProgress.Value = 0;
             textETA.Text = "ETA: ?";
             textSpeed.Text = "Speed: ?";
-            gridMain.Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
+            Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
             foreach (string file in Directory.GetFiles(filePath))
                 if (Path.GetFileName(file).StartsWith($"video{randomInt}"))
                     fileName = file;
 
-            if (cboxCut.IsChecked == true || cboxConvert.IsChecked == true)
+            if (cboxCut.IsChecked == true || cboxConvert.IsChecked == true || cboxBitrate.IsChecked == true)
             {
                 pbProgress.IsIndeterminate = true;
                 textStatus.Text = "Getting FFmpeg";
-                gridMain.Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
+                Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
                 if (!File.Exists(runningPath + "\\ffmpeg.exe"))
                     await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Full, runningPath);
                 textStatus.Text = "Processing";
-                gridMain.Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
+                Dispatcher.Invoke(new Action(() => { }), DispatcherPriority.Render);
                 var conversions = FFmpeg.Conversions.New();
                 if (cboxCut.IsChecked == true)
                     conversions.AddParameter($"-ss {TimeSpan.FromSeconds(Int32.Parse(tbFrom.Text))}");
@@ -109,6 +112,8 @@ namespace YTDownloadConvert
                     conversions.SetOutput($"{filePath}\\{videoTitle}{Path.GetExtension(fileName)}");
                 if (cboxCut.IsChecked == true)
                     conversions.AddParameter($"-to {TimeSpan.FromSeconds(Int32.Parse(tbTo.Text) - Int32.Parse(tbFrom.Text))}");
+                if (cboxBitrate.IsChecked == true)
+                    conversions.AddParameter($"-b {tbBitrate.Text}k");
                 /*
                 if (cboxConvert.IsChecked == true && cboxCut.IsChecked == false)
                     await conversions.AddParameter($"-i \"{fileName}\" \"{filePath}\\{videoTitle}{cbConvertType.Text}\"").Start();
@@ -121,6 +126,8 @@ namespace YTDownloadConvert
                 pbProgress.IsIndeterminate = false;
             }
             textStatus.Text = "Idle";
+            pbProgress.Visibility = Visibility.Hidden;
+            bGo.IsEnabled = true;
         }
 
         private void tbNumber_TextChanged(object sender, TextChangedEventArgs e)
@@ -139,7 +146,13 @@ namespace YTDownloadConvert
             VistaFolderBrowserDialog fbdFolder = new VistaFolderBrowserDialog();
             if (fbdFolder.ShowDialog() == true)
             {
-                tbDownloadPath.Text = "Download Path: " + fbdFolder.SelectedPath;
+                tbDownloadPath.Text = fbdFolder.SelectedPath;
+                filePath = fbdFolder.SelectedPath;
+                if (MessageBox.Show("Set this path as the default?", "Default?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    Properties.Settings.Default.defaultFilePath = fbdFolder.SelectedPath;
+                    Properties.Settings.Default.Save();
+                }
             }
         }
     }
