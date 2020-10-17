@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:YTDownloadConvert"
         mc:Ignorable="d"
-        Title="YTDownloadConvert" Height="300" Width="450" MinWidth="400" MinHeight="150">
+        Title="YTDownloadConvert" Height="320" Width="450" MinWidth="400" MinHeight="150">
     <Grid x:Name="gridMain">
         <TextBox x:Name="tbLink" Margin="5,5,70,0" TextWrapping="NoWrap" VerticalAlignment="Top" UndoLimit="10"/>
         <Button x:Name="bGo" Content="Download" HorizontalAlignment="Right" Margin="0,5,5,0" VerticalAlignment="Top" Click="bGo_Click" IsDefault="True" Height="18" BorderThickness="1,1,1,1" Width="60"/>
